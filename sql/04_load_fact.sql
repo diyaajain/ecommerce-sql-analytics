@@ -6,7 +6,8 @@
 
 INSERT INTO warehouse.fact_order_items (
     order_id, order_item_id, date_key, customer_key, product_key, seller_key,
-    order_status, price, freight_value, order_payment_total, review_score
+    order_status, price, freight_value, order_payment_total, review_score,
+    delivered_date, estimated_delivery_date, is_late
 )
 SELECT
     oi.order_id,
@@ -19,7 +20,13 @@ SELECT
     oi.price,
     oi.freight_value,
     pay.order_payment_total,
-    r.review_score
+    r.review_score,
+    o.order_delivered_customer_date::date,
+    o.order_estimated_delivery_date::date,
+    CASE
+        WHEN o.order_delivered_customer_date IS NULL THEN NULL  -- not delivered yet (or never was)
+        ELSE o.order_delivered_customer_date::date > o.order_estimated_delivery_date::date
+    END
 FROM raw.order_items oi
 JOIN raw.orders o
     ON o.order_id = oi.order_id

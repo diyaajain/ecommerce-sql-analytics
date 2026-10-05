@@ -66,5 +66,8 @@ CREATE TABLE warehouse.fact_order_items (
     freight_value  NUMERIC(10, 2),   -- this item's freight (safe to SUM directly)
     order_payment_total NUMERIC(10, 2),  -- the WHOLE ORDER's payment total, repeated per item — see grain note above
     review_score   INT,                   -- the order's review score, repeated per item
+    delivered_date           DATE,        -- order-level, repeated per item (same grain caveat as above)
+    estimated_delivery_date  DATE,        -- order-level, repeated per item
+    is_late                  BOOLEAN,     -- TRUE/FALSE once delivered; NULL if not yet delivered
     UNIQUE (order_id, order_item_id)
 );

@@ -6,6 +6,11 @@ alone — window functions, CTEs, ranking, cohort analysis, RFM segmentation,
 and query optimization. Python's only job here is loading CSVs; every
 transformation and every insight is SQL.
 
+> **Honesty note:** this project was built without a live Postgres instance
+> to test against, so while every script has been carefully hand-checked,
+> you'll be the one running it for the first time. If something errors,
+> paste it back and it'll get fixed.
+
 ## Why Postgres, not SQLite
 
 This project exists to demonstrate real SQL depth, and SQLite is missing or
@@ -100,6 +105,18 @@ psql $DB -f sql/04_load_fact.sql        # fills fact_order_items (joins + aggreg
 
 **Don't run `sql/05_indexes.sql` yet** — see the optimization demo below,
 which deliberately runs once before indexes and once after.
+
+**If you're adding the late-delivery analysis (query 7) to an existing
+setup:** `sql/01_star_schema.sql` and `sql/04_load_fact.sql` now include
+three new delivery-related columns. Since both scripts `DROP ... CASCADE`
+before recreating, just re-run the same four commands above — this only
+rebuilds the `warehouse` schema from the `raw` data already loaded, so it's
+fast and does **not** need the CSVs reloaded. Anything you already
+captured from queries 1, 2, 3, 4, or 6 is unaffected, since that data
+didn't change.
+
+**For the materialized view (query 8):** run `sql/06_materialized_view.sql`
+once, after the above, to create it.
 
 ## 5. Run the analytical queries
 
@@ -225,9 +242,30 @@ comment for why that's still a legitimate result.]
 category, [X], accounts for [X]% of total revenue — the top 3 categories
 together make up [X]%."]
 
+### 7. Late delivery analysis — `queries/07_late_delivery_analysis.sql`
+*Technique: `CASE WHEN` classification, date arithmetic, `FILTER (WHERE ...)`*
+
+![Late delivery analysis](results/07_late_delivery_analysis.png)
+
+**Finding:** [e.g. "[State] has the highest late-delivery rate at [X]%,
+averaging [X] days later than estimated when late — compared to the
+overall average of [X]%."]
+
+### 8. Materialized view comparison — `queries/08_materialized_view_comparison.sql`
+*Technique: materialized views, `\timing`*
+
+![Materialized view comparison](results/08_materialized_view_comparison.png)
+
+**Finding:** [State the two timings `\timing` reported. At this data size
+the gap may be small in absolute terms — say so; the point demonstrated
+is the concept (precomputed, snapshot data that needs explicit
+refreshing) more than a dramatic number. Note you ran this query with and
+without recomputing the aggregate from scratch.]
+
 ## Project structure
 
 ```
+├── docker-compose.yml       # local Postgres
 ├── .env.example             # connection settings
 ├── requirements.txt
 ├── load_raw.py               # thin CSV -> raw.* loader (no logic)
@@ -238,26 +276,28 @@ together make up [X]%."]
 │   ├── 02_load_dim_date.sql  # date dimension via generate_series
 │   ├── 03_load_dimensions.sql
 │   ├── 04_load_fact.sql      # the main ETL join
-│   └── 05_indexes.sql
+│   ├── 05_indexes.sql
+│   └── 06_materialized_view.sql  # precomputed monthly category revenue
 └── queries/
     ├── 01_monthly_revenue_trend.sql       # window functions: LAG, moving avg
     ├── 02_top_products_by_category.sql    # DENSE_RANK PARTITION BY
     ├── 03_cohort_retention.sql            # multi-CTE cohort analysis
     ├── 04_rfm_segmentation.sql            # NTILE quartile scoring
     ├── 05_query_optimization_demo.sql     # EXPLAIN ANALYZE, indexing
-    └── 06_running_totals_and_pct_of_total.sql  # SUM() OVER, two ways
+    ├── 06_running_totals_and_pct_of_total.sql  # SUM() OVER, two ways
+    ├── 07_late_delivery_analysis.sql      # CASE WHEN, date arithmetic
+    └── 08_materialized_view_comparison.sql  # \timing, materialized views
 ```
 
 ## Ideas to add next
 
-- A late-delivery analysis (`order_delivered_customer_date` vs.
-  `order_estimated_delivery_date`) with a `CASE WHEN` flag
-- A materialized view for one of the heavier queries, with a comparison
-  of query time against the plain view
 - A recursive CTE, if a hierarchical structure can be found or
-  constructed in the category data
+  constructed in the category data (Olist's categories are flat, so this
+  would need either a different data source or an artificial hierarchy —
+  worth deciding if that's a genuine fit before building it)
 - Loading `olist_geolocation_dataset.csv` and adding geographic analysis
 
 ## Tech
 
-PostgreSQL 16, Python (pandas, SQLAlchemy, psycopg2) for loading only — all analysis is SQL.
+PostgreSQL 16, Docker, Python (pandas, SQLAlchemy, psycopg2) for loading
+only — all analysis is SQL.

@@ -220,9 +220,8 @@ erDiagram
   <img src="results/01_monthly_revenue_trend.png" alt="Monthly revenue trend" width="500">
 </p>
 
-**Finding:** [e.g. "Revenue grew from ₹X in month A to ₹Y by month B, with
-the sharpest single-month jump of [X]% in [month] — worth checking whether
-that lines up with a known sales event."]
+**Finding:** Revenue grew from ₹19.62 in September 2016 to ₹996,973.51 by September 2018, with the strongest month-over-month increase of **107.1% in February 2017**. Growth was generally positive through 2017, but became more volatile in 2018, including a **17.7% increase in March** followed by a **10.9% decline in June** and a **4.1% decline in August**.
+
 
 ### 2. Top products by category — `queries/02_top_products_by_category.sql`
 *Technique: `DENSE_RANK() PARTITION BY`*

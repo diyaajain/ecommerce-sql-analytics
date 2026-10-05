@@ -118,6 +118,16 @@ didn't change.
 **For the materialized view (query 8):** run `sql/06_materialized_view.sql`
 once, after the above, to create it.
 
+**Data quality checks:** run after `sql/04_load_fact.sql`, any time —
+useful both right after a fresh load and as a sanity check any time the
+ETL logic changes:
+```bash
+psql $DB -f sql/07_data_quality_tests.sql
+```
+An **empty result** means every check passed. If any row prints, it names
+exactly which check failed and how many rows are affected — see the
+file's header comment for why each check exists.
+
 ## 5. Run the analytical queries
 
 ```bash
@@ -143,6 +153,56 @@ comment for what a realistic (not dramatic) result looks like at this data
 size.
 
 ## Data model
+
+*Renders as a diagram on GitHub and most Markdown viewers that support
+Mermaid; shows as a plain code block otherwise.*
+
+```mermaid
+erDiagram
+    DIM_DATE ||--o{ FACT_ORDER_ITEMS : "date_key"
+    DIM_CUSTOMER ||--o{ FACT_ORDER_ITEMS : "customer_key"
+    DIM_PRODUCT ||--o{ FACT_ORDER_ITEMS : "product_key"
+    DIM_SELLER ||--o{ FACT_ORDER_ITEMS : "seller_key"
+
+    DIM_DATE {
+        date date_key PK
+        int year
+        int month
+        boolean is_weekend
+    }
+    DIM_CUSTOMER {
+        int customer_key PK
+        text customer_id
+        text customer_unique_id "real distinct-person id"
+        text city
+        text state
+    }
+    DIM_PRODUCT {
+        int product_key PK
+        text product_id
+        text category_english
+    }
+    DIM_SELLER {
+        int seller_key PK
+        text seller_id
+        text city
+        text state
+    }
+    FACT_ORDER_ITEMS {
+        int fact_key PK
+        text order_id
+        int order_item_id
+        date date_key FK
+        int customer_key FK
+        int product_key FK
+        int seller_key FK
+        numeric price
+        numeric freight_value
+        numeric order_payment_total "order-level, repeated per item"
+        int review_score "order-level, repeated per item"
+        boolean is_late
+    }
+```
 
 **Grain decision:** `fact_order_items` is at the **order-item** level —
 one row per product within an order. Payments and reviews in the raw data
@@ -262,6 +322,15 @@ is the concept (precomputed, snapshot data that needs explicit
 refreshing) more than a dramatic number. Note you ran this query with and
 without recomputing the aggregate from scratch.]
 
+### Data quality tests — `sql/07_data_quality_tests.sql`
+*Technique: self-checking ETL — assertions written as queries that should return nothing*
+
+**Result:** [State whether the result was empty (all checks passed) or
+paste which check(s) returned a row and the affected count. If something
+failed, that's a genuine finding worth documenting — it means the ETL
+has a real bug to fix, which is more impressive to show you caught and
+explain than to hide.]
+
 ## Project structure
 
 ```
@@ -277,7 +346,8 @@ without recomputing the aggregate from scratch.]
 │   ├── 03_load_dimensions.sql
 │   ├── 04_load_fact.sql      # the main ETL join
 │   ├── 05_indexes.sql
-│   └── 06_materialized_view.sql  # precomputed monthly category revenue
+│   ├── 06_materialized_view.sql  # precomputed monthly category revenue
+│   └── 07_data_quality_tests.sql # self-checking assertions on the ETL
 └── queries/
     ├── 01_monthly_revenue_trend.sql       # window functions: LAG, moving avg
     ├── 02_top_products_by_category.sql    # DENSE_RANK PARTITION BY

@@ -11,6 +11,7 @@
 -- real-world data volumes or with heavier queries (multiple large joins,
 -- window functions over millions of rows).
 
+\pset pager off
 \timing on
 
 -- (1) The live aggregate — recomputed from scratch every time

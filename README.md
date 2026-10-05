@@ -230,8 +230,7 @@ erDiagram
   <img src="results/02_top_products_by_category.png" alt="Top products by category" width="500">
 </p>
 
-**Finding:** [e.g. "The top category by revenue is [X], and its #1 product
-alone accounts for [X]% of that category's revenue."]
+**Finding:** The **Health & Beauty** category has the highest-revenue product, generating **₹63,885**, followed by **Computers** at ₹48,899.34 and **Computers Accessories** at ₹46,916.51. The top Health & Beauty product alone accounts for a substantial share of the category’s revenue, making it a key product to monitor for category performance.
 
 ### 3. Cohort retention — `queries/03_cohort_retention.sql`
 *Technique: multi-step CTEs*
@@ -240,10 +239,7 @@ alone accounts for [X]% of that category's revenue."]
   <img src="results/03_cohort_retention.png" alt="Cohort retention" width="500">
 </p>
 
-**Finding:** [State the actual retention percentages you see. Given this
-dataset's known near-single-purchase behavior (see "Known data
-characteristics" above), a low number here is an expected, real finding —
-report it as one rather than treating it as a failed query.]
+**Finding:** Customer retention drops sharply after the first purchase, with most cohorts showing **near-zero retention in subsequent months**. This indicates that repeat purchasing is very rare in this sample, suggesting a strong opportunity to improve **customer retention and repeat-purchase strategies**.
 
 ### 4. RFM segmentation — `queries/04_rfm_segmentation.sql`
 *Technique: `NTILE()` quartile scoring*
@@ -252,9 +248,7 @@ report it as one rather than treating it as a failed query.]
   <img src="results/04_rfm_segmentation.png" alt="RFM segmentation" width="500">
 </p>
 
-**Finding:** [e.g. "The top RFM-scored segment (score 10-12) represents
-[X] customers — worth describing who they are: recent, frequent, and/or
-high-spend."]
+**Finding:** The highest RFM score is **12**, with the top-scoring customers earning a **4/4/4** across recency, frequency, and monetary value. These customers represent the strongest-value segment: relatively recent purchasers who also rank highly on purchase frequency and spending.
 
 ### 5. Query optimization — `queries/05_query_optimization_demo.sql`
 *Technique: `EXPLAIN ANALYZE`, indexing*

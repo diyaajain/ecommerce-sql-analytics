@@ -199,30 +199,6 @@ erDiagram
     }
 ```
 
-**Grain decision:** `fact_order_items` is at the **order-item** level —
-one row per product within an order. Payments and reviews in the raw data
-are at the **order** level (one review, and possibly several payment
-installments, per order). To fit an item-grain fact table, payments are
-summed per order and repeated across that order's items, and the order's
-review score is likewise repeated. This means:
-- `SUM(price)` and `SUM(freight_value)` are safe — each item's own values.
-- `SUM(order_payment_total)` is **not** safe for orders with more than one
-  item — it double-counts. Use `SUM(order_payment_total)` only after
-  deduplicating to one row per `order_id` first.
-
-This is a real, common data-warehouse modeling tradeoff, not an oversight
-— see `sql/01_star_schema.sql`'s header comment for the full explanation.
-It's worth being able to explain this tradeoff out loud; it's exactly the
-kind of thing a technical interviewer asks about.
-
-**The customer_id / customer_unique_id split:** Olist's `customer_id` is
-actually per-*order*, not per-*person* — the same real customer gets a new
-`customer_id` on every order. `customer_unique_id` is the real person
-identifier. `dim_customer` keeps both; every query here that counts
-"distinct customers" groups by `customer_unique_id`, not `customer_id`.
-Getting this wrong is an easy, realistic mistake — worth calling out
-explicitly in a portfolio write-up as something you caught.
-
 ## Known data characteristics (not bugs)
 
 - **Repeat purchases are rare.** Most Olist customers buy exactly once, so
@@ -240,7 +216,9 @@ explicitly in a portfolio write-up as something you caught.
 ### 1. Monthly revenue trend — `queries/01_monthly_revenue_trend.sql`
 *Technique: window functions (`LAG`, a moving-average frame)*
 
-![Monthly revenue trend](results/01_monthly_revenue_trend.png)
+<p align="center">
+  <img src="results/01_monthly_revenue_trend.png" alt="Monthly revenue trend" width="500">
+</p>
 
 **Finding:** [e.g. "Revenue grew from ₹X in month A to ₹Y by month B, with
 the sharpest single-month jump of [X]% in [month] — worth checking whether
@@ -249,7 +227,9 @@ that lines up with a known sales event."]
 ### 2. Top products by category — `queries/02_top_products_by_category.sql`
 *Technique: `DENSE_RANK() PARTITION BY`*
 
-![Top products by category](results/02_top_products_by_category.png)
+<p align="center">
+  <img src="results/02_top_products_by_category.png" alt="Top products by category" width="500">
+</p>
 
 **Finding:** [e.g. "The top category by revenue is [X], and its #1 product
 alone accounts for [X]% of that category's revenue."]
@@ -257,7 +237,9 @@ alone accounts for [X]% of that category's revenue."]
 ### 3. Cohort retention — `queries/03_cohort_retention.sql`
 *Technique: multi-step CTEs*
 
-![Cohort retention](results/03_cohort_retention.png)
+<p align="center">
+  <img src="results/03_cohort_retention.png" alt="Cohort retention" width="500">
+</p>
 
 **Finding:** [State the actual retention percentages you see. Given this
 dataset's known near-single-purchase behavior (see "Known data
@@ -267,7 +249,9 @@ report it as one rather than treating it as a failed query.]
 ### 4. RFM segmentation — `queries/04_rfm_segmentation.sql`
 *Technique: `NTILE()` quartile scoring*
 
-![RFM segmentation](results/04_rfm_segmentation.png)
+<p align="center">
+  <img src="results/04_rfm_segmentation.png" alt="RFM segmentation" width="500">
+</p>
 
 **Finding:** [e.g. "The top RFM-scored segment (score 10-12) represents
 [X] customers — worth describing who they are: recent, frequent, and/or
@@ -297,7 +281,9 @@ together make up [X]%."]
 ### 7. Late delivery analysis — `queries/07_late_delivery_analysis.sql`
 *Technique: `CASE WHEN` classification, date arithmetic, `FILTER (WHERE ...)`*
 
-![Late delivery analysis](results/07_late_delivery_analysis.png)
+<p align="center">
+  <img src="results/07_late_delivery_analysis.png" alt="Late delivery analysis" width="500">
+</p>
 
 **Finding:** [e.g. "[State] has the highest late-delivery rate at [X]%,
 averaging [X] days later than estimated when late — compared to the
@@ -306,7 +292,9 @@ overall average of [X]%."]
 ### 8. Materialized view comparison — `queries/08_materialized_view_comparison.sql`
 *Technique: materialized views, `\timing`*
 
-![Materialized view comparison](results/08_materialized_view_comparison.png)
+<p align="center">
+  <img src="results/08_materialized_view_comparison.png" alt="Materialized view comparison" width="500">
+</p>
 
 **Finding:** [State the two timings `\timing` reported. At this data size
 the gap may be small in absolute terms — say so; the point demonstrated

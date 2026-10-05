@@ -286,7 +286,9 @@ comment for why that's still a legitimate result.]
 ### 6. Running totals and percent of total — `queries/06_running_totals_and_pct_of_total.sql`
 *Technique: `SUM() OVER` with and without `ORDER BY` — cumulative total vs. grand-total share*
 
-<img src="results/06_running_totals_and_pct_of_total.png" alt="Running totals and percent of total" width="600">
+<p align="center">
+  <img src="results/06_running_totals_and_pct_of_total.png" alt="Running totals and percent of total" width="500">
+</p>
 
 **Finding:** [e.g. "Cumulative revenue crossed ₹X by [month]. The top
 category, [X], accounts for [X]% of total revenue — the top 3 categories

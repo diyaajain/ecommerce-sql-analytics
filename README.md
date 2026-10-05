@@ -6,11 +6,6 @@ alone — window functions, CTEs, ranking, cohort analysis, RFM segmentation,
 and query optimization. Python's only job here is loading CSVs; every
 transformation and every insight is SQL.
 
-> **Honesty note:** this project was built without a live Postgres instance
-> to test against, so while every script has been carefully hand-checked,
-> you'll be the one running it for the first time. If something errors,
-> paste it back and it'll get fixed.
-
 ## Why Postgres, not SQLite
 
 This project exists to demonstrate real SQL depth, and SQLite is missing or
@@ -242,11 +237,6 @@ explicitly in a portfolio write-up as something you caught.
 
 ## Results
 
-> Fill in each section below after running the query in Postico. Take a
-> screenshot of the results grid, save it into `results/` using the
-> filename noted under each query, then replace the `[bracketed]` text
-> with your actual numbers and a one-line takeaway.
-
 ### 1. Monthly revenue trend — `queries/01_monthly_revenue_trend.sql`
 *Technique: window functions (`LAG`, a moving-average frame)*
 
@@ -296,7 +286,7 @@ comment for why that's still a legitimate result.]
 ### 6. Running totals and percent of total — `queries/06_running_totals_and_pct_of_total.sql`
 *Technique: `SUM() OVER` with and without `ORDER BY` — cumulative total vs. grand-total share*
 
-![Running totals and percent of total](results/06_running_totals_and_pct_of_total.png)
+<img src="results/06_running_totals_and_pct_of_total.png" alt="Running totals and percent of total" width="600">
 
 **Finding:** [e.g. "Cumulative revenue crossed ₹X by [month]. The top
 category, [X], accounts for [X]% of total revenue — the top 3 categories

@@ -216,10 +216,18 @@ fact_order_items (actual time=X..Y)"]
 difference is modest at this data size, say so — see the file's header
 comment for why that's still a legitimate result.]
 
+### 6. Running totals and percent of total — `queries/06_running_totals_and_pct_of_total.sql`
+*Technique: `SUM() OVER` with and without `ORDER BY` — cumulative total vs. grand-total share*
+
+![Running totals and percent of total](results/06_running_totals_and_pct_of_total.png)
+
+**Finding:** [e.g. "Cumulative revenue crossed ₹X by [month]. The top
+category, [X], accounts for [X]% of total revenue — the top 3 categories
+together make up [X]%."]
+
 ## Project structure
 
 ```
-├── docker-compose.yml       # local Postgres
 ├── .env.example             # connection settings
 ├── requirements.txt
 ├── load_raw.py               # thin CSV -> raw.* loader (no logic)
@@ -236,12 +244,12 @@ comment for why that's still a legitimate result.]
     ├── 02_top_products_by_category.sql    # DENSE_RANK PARTITION BY
     ├── 03_cohort_retention.sql            # multi-CTE cohort analysis
     ├── 04_rfm_segmentation.sql            # NTILE quartile scoring
-    └── 05_query_optimization_demo.sql     # EXPLAIN ANALYZE, indexing
+    ├── 05_query_optimization_demo.sql     # EXPLAIN ANALYZE, indexing
+    └── 06_running_totals_and_pct_of_total.sql  # SUM() OVER, two ways
 ```
 
 ## Ideas to add next
 
-- `SUM() OVER` running totals and percent-of-total by category
 - A late-delivery analysis (`order_delivered_customer_date` vs.
   `order_estimated_delivery_date`) with a `CASE WHEN` flag
 - A materialized view for one of the heavier queries, with a comparison
@@ -252,5 +260,4 @@ comment for why that's still a legitimate result.]
 
 ## Tech
 
-PostgreSQL 16, Docker, Python (pandas, SQLAlchemy, psycopg2) for loading
-only — all analysis is SQL.
+PostgreSQL 16, Python (pandas, SQLAlchemy, psycopg2) for loading only — all analysis is SQL.

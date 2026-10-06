@@ -295,15 +295,6 @@ is the concept (precomputed, snapshot data that needs explicit
 refreshing) more than a dramatic number. Note you ran this query with and
 without recomputing the aggregate from scratch.]
 
-### Data quality tests — `sql/07_data_quality_tests.sql`
-*Technique: self-checking ETL — assertions written as queries that should return nothing*
-
-**Result:** [State whether the result was empty (all checks passed) or
-paste which check(s) returned a row and the affected count. If something
-failed, that's a genuine finding worth documenting — it means the ETL
-has a real bug to fix, which is more impressive to show you caught and
-explain than to hide.]
-
 ## Project structure
 
 ```
